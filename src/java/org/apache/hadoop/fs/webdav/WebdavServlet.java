@@ -29,7 +29,7 @@ import javax.servlet.ServletException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.security.UnixUserGroupInformation;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.fs.permission.AccessControlException;
 import org.apache.jackrabbit.server.AbstractWebdavServlet;
 import org.apache.jackrabbit.webdav.*;
@@ -332,9 +332,6 @@ public class WebdavServlet extends AbstractWebdavServlet {
             WebdavHashUserRealm userRealm = (WebdavHashUserRealm) webapp.getSecurityHandler().getUserRealm();
             List<String> userRoles = userRealm.getUserRoles(currentUserName);
             currentUserRoles = userRoles;
-
-            UnixUserGroupInformation ugi = new UnixUserGroupInformation(currentUserName, userRoles.toArray(new String[0]));
-            UnixUserGroupInformation.saveToConf(conf, UnixUserGroupInformation.UGI_PROPERTY_NAME, ugi);
         }
         return conf;
     }

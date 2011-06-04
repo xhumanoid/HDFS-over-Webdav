@@ -38,7 +38,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.AccessControlException;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.util.StringUtils;
-import org.apache.hadoop.security.UnixUserGroupInformation;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.jackrabbit.webdav.*;
 import org.apache.jackrabbit.webdav.jcr.ItemResourceConstants;
 import org.apache.jackrabbit.webdav.security.*;
@@ -57,9 +57,6 @@ import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.jackrabbit.webdav.simple.ResourceConfig;
-
-import javax.security.auth.login.LoginException;
-import javax.jcr.RepositoryException;
 
 public class FSDavResource implements DavResource {
 
@@ -336,15 +333,12 @@ public class FSDavResource implements DavResource {
             properties.add(new DefaultDavProperty(SecurityConstants.OWNER, fstat.getOwner()));
             properties.add(new DefaultDavProperty(SecurityConstants.GROUP, fstat.getGroup()));
 
-            UnixUserGroupInformation ugi = UnixUserGroupInformation.readFromConf(this.conf,
-                                                                                 UnixUserGroupInformation.UGI_PROPERTY_NAME);
+            UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
             CurrentUserPrivilegeSetProperty currentUserPrivilegeSetProperty = UtilsHelper.getCurrentUserPrivilegeSetProperty(fstat, ugi);
             properties.add(new DefaultDavProperty(SecurityConstants.CURRENT_USER_PRIVILEGE_SET,
                                                   currentUserPrivilegeSetProperty.getValue()));
         } catch (IOException ex) {
             LOG.warn(StringUtils.stringifyException(ex));
-        } catch (LoginException e) {
-            LOG.warn(StringUtils.stringifyException(e));
         }
         // set (or reset) fundamental properties
         if (getDisplayName() != null) {
